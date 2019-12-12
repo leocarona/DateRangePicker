@@ -74,6 +74,7 @@ public class CalendarPickerView extends RecyclerView {
     final List<MonthCellDescriptor> highlightedCells = new ArrayList<>();
     final List<Calendar> selectedCals = new ArrayList<>();
     final List<Calendar> highlightedCals = new ArrayList<>();
+    final List<Calendar> activatedCals = new ArrayList<>();
     ArrayList<Integer> deactivatedDates = new ArrayList<>();
     private Locale locale;
     private TimeZone timeZone;
@@ -220,6 +221,7 @@ public class CalendarPickerView extends RecyclerView {
         selectedCells.clear();
         highlightedCals.clear();
         highlightedCells.clear();
+        activatedCals.clear();
 
         // Clear previous state.
         cells.clear();
@@ -314,6 +316,11 @@ public class CalendarPickerView extends RecyclerView {
 
         public FluentInitializer withHighlightedDate(Date date) {
             return withHighlightedDates(Collections.singletonList(date));
+        }
+
+        public FluentInitializer withAllDatesDeactivatedExcept(List<Date> dates) {
+            activateDates(dates);
+            return this;
         }
 
         @SuppressLint("SimpleDateFormat")
@@ -494,6 +501,9 @@ public class CalendarPickerView extends RecyclerView {
     public List<Date> getSelectedDates() {
         List<Date> selectedDates = new ArrayList<>();
         for (MonthCellDescriptor cal : selectedCells) {
+            Calendar c = Calendar.getInstance(timeZone, locale);
+            c.setTime(cal.getDate());
+            setMidnight(c);
             if (!highlightedCells.contains(cal) && !deactivatedDates.contains(cal.getDate().getDay() + 1))
                 selectedDates.add(cal.getDate());
         }
@@ -531,7 +541,8 @@ public class CalendarPickerView extends RecyclerView {
             calendar.setTime(clickedDate);
 
             int day = calendar.get(DAY_OF_WEEK);
-            if (deactivatedDates.contains(day)) {
+            if ((!activatedCals.isEmpty() && !activatedCals.contains(calendar)) ||
+                    deactivatedDates.contains(day)) {
                 return;
             }
 
@@ -650,7 +661,8 @@ public class CalendarPickerView extends RecyclerView {
                                     singleCell.setUnavailable(true);
                                     singleCell.setHighlighted(false);
                                     selectedCells.add(singleCell);
-                                } else if (!deactivatedDates.contains(singleCell.getDate().getDay() + 1)) {
+                                } else if ((!activatedCals.isEmpty() && activatedCals.contains(singleCell)) &&
+                                        !deactivatedDates.contains(singleCell.getDate().getDay() + 1)) {
                                     singleCell.setSelected(true);
                                     singleCell.setDeactivated(false);
                                     singleCell.setRangeState(RangeState.MIDDLE);
@@ -746,6 +758,24 @@ public class CalendarPickerView extends RecyclerView {
         validateAndUpdate();
     }
 
+    public void activateDates(Collection<Date> activeDates) {
+        for (Date date : activeDates) {
+            validateDate(date);
+
+            MonthCellWithMonthIndex monthCellWithMonthIndex = getMonthCellWithIndexByDate(date);
+            if (monthCellWithMonthIndex != null) {
+                Calendar dateAsCalendar = Calendar.getInstance(timeZone, locale);
+                dateAsCalendar.setTime(date);
+                //MonthCellDescriptor cell = monthCellWithMonthIndex.cell;
+
+                //highlightedCells.add(cell);
+                activatedCals.add(dateAsCalendar);
+            }
+        }
+
+        validateAndUpdate();
+    }
+
     private static final String TAG = CalendarPickerView.class.getSimpleName();
 
     public void deactivateDates(ArrayList<Integer> deactivatedDates) {
@@ -819,7 +849,7 @@ public class CalendarPickerView extends RecyclerView {
         public MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             MonthView view = MonthView.create(parent, inflater, weekdayNameFormat, listener, today, dividerColor,
                 dayBackgroundResId, dayTextColorResId, titleTextColor, displayHeader,
-                headerTextColor, decorators, locale, dayViewAdapter);
+                headerTextColor, decorators, timeZone, locale, dayViewAdapter);
 
             view.setTag(R.id.day_view_adapter_class, dayViewAdapter.getClass());
 
@@ -834,7 +864,7 @@ public class CalendarPickerView extends RecyclerView {
                 position = months.size() - position - 1;
             }
             view.init(months.get(position), cells.getValueAtIndex(position), displayOnly,
-                titleTypeface, dateTypeface, deactivatedDates, subTitles);
+                titleTypeface, dateTypeface, activatedCals, deactivatedDates, subTitles);
 
         }
 
@@ -881,8 +911,9 @@ public class CalendarPickerView extends RecyclerView {
                 Date date = cal.getTime();
                 boolean isCurrentMonth = cal.get(MONTH) == month.getMonth();
                 boolean isSelected = isCurrentMonth && containsDate(selectedCals, cal);
+                boolean isActivated = activatedCals.isEmpty() || containsDate(activatedCals, cal);
                 boolean isSelectable =
-                        isCurrentMonth && betweenDates(cal, minCal, maxCal) && isDateSelectable(date);
+                        isCurrentMonth && betweenDates(cal, minCal, maxCal) && isDateSelectable(date) && isActivated;
                 boolean isToday = sameDate(cal, today);
                 boolean isHighlighted = containsDate(highlightedCals, cal);
                 int value = cal.get(DAY_OF_MONTH);

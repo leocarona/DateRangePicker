@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class MonthView extends LinearLayout {
     TextView title;
@@ -23,6 +24,7 @@ public class MonthView extends LinearLayout {
     private Listener listener;
     private List<CalendarCellDecorator> decorators;
     private boolean isRtl;
+    private TimeZone timeZone;
     private Locale locale;
 
     ArrayList<Integer> deactivatedDates;
@@ -30,16 +32,16 @@ public class MonthView extends LinearLayout {
     public static MonthView create(ViewGroup parent, LayoutInflater inflater,
                                    DateFormat weekdayNameFormat, Listener listener, Calendar today, int dividerColor,
                                    int dayBackgroundResId, int dayTextColorResId, int titleTextColor, boolean displayHeader,
-                                   int headerTextColor, Locale locale, DayViewAdapter adapter) {
+                                   int headerTextColor, TimeZone timeZone, Locale locale, DayViewAdapter adapter) {
         return create(parent, inflater, weekdayNameFormat, listener, today, dividerColor,
                 dayBackgroundResId, dayTextColorResId, titleTextColor, displayHeader, headerTextColor, null,
-                locale, adapter);
+                timeZone, locale, adapter);
     }
 
     public static MonthView create(ViewGroup parent, LayoutInflater inflater,
                                    DateFormat weekdayNameFormat, Listener listener, Calendar today, int dividerColor,
                                    int dayBackgroundResId, int dayTextColorResId, int titleTextColor, boolean displayHeader,
-                                   int headerTextColor, List<CalendarCellDecorator> decorators, Locale locale,
+                                   int headerTextColor, List<CalendarCellDecorator> decorators, TimeZone timeZone, Locale locale,
                                    DayViewAdapter adapter) {
         final MonthView view = (MonthView) inflater.inflate(R.layout.month, parent, false);
         view.setDayViewAdapter(adapter);
@@ -56,6 +58,7 @@ public class MonthView extends LinearLayout {
         final int originalDayOfWeek = today.get(Calendar.DAY_OF_WEEK);
 
         view.isRtl = isRtl(locale);
+        view.timeZone = timeZone;
         view.locale = locale;
         int firstDayOfWeek = today.getFirstDayOfWeek();
         final CalendarRowView headerRow = (CalendarRowView) view.grid.getChildAt(0);
@@ -105,7 +108,7 @@ public class MonthView extends LinearLayout {
     }
 
     public void init(MonthDescriptor month, List<List<MonthCellDescriptor>> cells,
-                     boolean displayOnly, Typeface titleTypeface, Typeface dateTypeface, ArrayList<Integer> deactivatedDates, @Nullable ArrayList<SubTitle> subTitles) {
+                     boolean displayOnly, Typeface titleTypeface, Typeface dateTypeface, List<Calendar> activatedDates, ArrayList<Integer> deactivatedDates, @Nullable ArrayList<SubTitle> subTitles) {
 
 
         Logr.d("Initializing MonthView (%d) for %s", System.identityHashCode(this), month);

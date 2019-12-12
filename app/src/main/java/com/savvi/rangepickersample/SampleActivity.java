@@ -35,6 +35,13 @@ public class SampleActivity extends AppCompatActivity {
 
         calendar = findViewById(R.id.calendar_view);
         button = findViewById(R.id.get_selected_dates);
+
+        /*
+        * Option 1)
+        *     Make certain week days unselectable by using .withDeactivateDates(list)
+        *     Add subtitles to certain dates by using .withSubTitles(getSubTitles())
+        *     Highlight certain dates and make them unselectable by using .withHighlightedDates(arrayList)
+        */
         ArrayList<Integer> list = new ArrayList<>();
         list.add(2);
 
@@ -58,6 +65,35 @@ public class SampleActivity extends AppCompatActivity {
                 .withDeactivateDates(list)
                 .withSubTitles(getSubTitles())
                 .withHighlightedDates(arrayList);
+
+        /*
+        * Options 2)
+        *     You may as well opt for having only a list of specific dates that are selectable on your calendar,
+        *      and all the rest of the dates are deactivated. If that's your case, you may use this:
+        *
+        ArrayList<Date> arrayList2 = new ArrayList<>();
+        try {
+            SimpleDateFormat dateformat = new SimpleDateFormat("dd-MM-yyyy");
+
+            String strdate = "20-12-2019";
+            String strdate2 = "25-12-2019";
+            String strdate3 = "30-12-2019";
+
+            Date newdate = dateformat.parse(strdate);
+            Date newdate2 = dateformat.parse(strdate2);
+            Date newdate3 = dateformat.parse(strdate3);
+            arrayList2.add(newdate);
+            arrayList2.add(newdate2);
+            arrayList2.add(newdate3);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+
+        calendar.init(lastYear.getTime(), nextYear.getTime(), new SimpleDateFormat("MMMM, YYYY", Locale.getDefault()))
+                .inMode(CalendarPickerView.SelectionMode.RANGE)
+                .withAllDatesDeactivatedExcept(arrayList2);
+        */
 
         calendar.scrollToDate(new Date());
 

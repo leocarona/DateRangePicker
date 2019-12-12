@@ -43,6 +43,18 @@ Usage
                 
  
 ```
+[NEW] You may as well opt for having only a list of specific dates that are selectable on your calendar, and all the rest of the dates are deactivated. If that's your case, you may use this:
+
+```kotlin
+
+        calendar.init(lastYear.getTime(), nextYear.getTime())
+                .inMode(CalendarPickerView.SelectionMode.RANGE)
+// deactivates all dates except for the ones in your arrayList
+                .withAllDatesDeactivatedExcept(arrayList)
+
+
+```
+
  * There are other Selection modes also SINGLE and MULTIPLE
  * Adding Deactivated Dates
   User wont able to select these dates they will be deactivated.
