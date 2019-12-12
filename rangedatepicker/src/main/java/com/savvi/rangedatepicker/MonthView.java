@@ -142,7 +142,9 @@ public class MonthView extends LinearLayout {
 
                     cellView.setEnabled(cell.isCurrentMonth());
                     int dayOfWeek = c + 1;
-                    if (deactivatedDates.contains(dayOfWeek)) {
+                    Calendar calendar = Calendar.getInstance(timeZone, locale);
+                    calendar.setTime(cell.getDate());
+                    if ((!activatedDates.isEmpty() && !activatedDates.contains(calendar)) || deactivatedDates.contains(dayOfWeek)) {
                         cellView.setClickable(false);
                         cellView.setSelectable(cell.isSelectable());
                         cellView.setSelected(false);
