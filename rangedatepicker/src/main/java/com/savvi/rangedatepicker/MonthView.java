@@ -139,13 +139,8 @@ public class MonthView extends LinearLayout {
 
                     cellView.setEnabled(cell.isCurrentMonth());
                     int dayOfWeek = c + 1;
-                    if (deactivatedDates.contains(dayOfWeek))
-                        cellView.setClickable(false);
-                    else
-                        cellView.setClickable(!displayOnly);
-
-
                     if (deactivatedDates.contains(dayOfWeek)) {
+                        cellView.setClickable(false);
                         cellView.setSelectable(cell.isSelectable());
                         cellView.setSelected(false);
                         cellView.setCurrentMonth(cell.isCurrentMonth());
@@ -156,7 +151,7 @@ public class MonthView extends LinearLayout {
                         cellView.setDeactivated(true);
 
                     } else {
-
+                        cellView.setClickable(!displayOnly);
                         cellView.setSelectable(cell.isSelectable());
                         cellView.setSelected(cell.isSelected());
                         cellView.setCurrentMonth(cell.isCurrentMonth());

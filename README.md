@@ -31,7 +31,7 @@ Usage
       
 ```kotlin
 
-        calendar.init(lastYear.getTime(), nextYear.getTime()) //
+        calendar.init(lastYear.getTime(), nextYear.getTime())
                 .inMode(CalendarPickerView.SelectionMode.RANGE)
                 .withSelectedDate(new Date())
 // deactivates given dates, non selectable
