@@ -1,5 +1,6 @@
 package com.savvi.rangepickersample;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -102,6 +103,14 @@ public class SampleActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Toast.makeText(SampleActivity.this, "list " + calendar.getSelectedDates().toString(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+        findViewById(R.id.get_calendar2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), ActiveDatesRangePickerSampleActivity.class);
+                startActivity(intent);
             }
         });
     }
