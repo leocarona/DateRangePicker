@@ -320,6 +320,17 @@ public class CalendarPickerView extends RecyclerView {
 
         public FluentInitializer withAllDatesDeactivatedExcept(List<Date> dates) {
             activateDates(dates);
+
+            // Set basic selectable filter
+            setDateSelectableFilter(new CalendarPickerView.DateSelectableFilter() {
+                @Override
+                public boolean isDateSelectable(Date date) {
+                    Calendar searchCal = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
+                    searchCal.setTime(date);
+                    return !activatedCals.isEmpty() && activatedCals.contains(searchCal);
+                }
+            });
+
             return this;
         }
 
@@ -541,8 +552,7 @@ public class CalendarPickerView extends RecyclerView {
             calendar.setTime(clickedDate);
 
             int day = calendar.get(DAY_OF_WEEK);
-            if ((!activatedCals.isEmpty() && !activatedCals.contains(calendar)) ||
-                    deactivatedDates.contains(day)) {
+            if (deactivatedDates.contains(day)) {
                 return;
             }
 
@@ -661,7 +671,7 @@ public class CalendarPickerView extends RecyclerView {
                                     singleCell.setUnavailable(true);
                                     singleCell.setHighlighted(false);
                                     selectedCells.add(singleCell);
-                                } else if ((!activatedCals.isEmpty() && activatedCals.contains(singleCell)) &&
+                                } else if (isDateSelectable(singleCell.getDate()) &&
                                         !deactivatedDates.contains(singleCell.getDate().getDay() + 1)) {
                                     singleCell.setSelected(true);
                                     singleCell.setDeactivated(false);
@@ -802,6 +812,22 @@ public class CalendarPickerView extends RecyclerView {
         validateAndUpdate();
     }
 
+    public List<Calendar> getActivatedDates() {
+        return activatedCals;
+    }
+
+    public void replaceActivatedDates(Collection<Date> activeDates) {
+        activatedCals.clear();
+
+        activateDates(activeDates);
+    }
+
+    public void clearActivatedDates() {
+        activatedCals.clear();
+
+        validateAndUpdate();
+    }
+
     /**
      * Hold a cell with a month-index.
      */
@@ -911,9 +937,8 @@ public class CalendarPickerView extends RecyclerView {
                 Date date = cal.getTime();
                 boolean isCurrentMonth = cal.get(MONTH) == month.getMonth();
                 boolean isSelected = isCurrentMonth && containsDate(selectedCals, cal);
-                boolean isActivated = activatedCals.isEmpty() || containsDate(activatedCals, cal);
                 boolean isSelectable =
-                        isCurrentMonth && betweenDates(cal, minCal, maxCal) && isDateSelectable(date) && isActivated;
+                        isCurrentMonth && betweenDates(cal, minCal, maxCal) && isDateSelectable(date);
                 boolean isToday = sameDate(cal, today);
                 boolean isHighlighted = containsDate(highlightedCals, cal);
                 int value = cal.get(DAY_OF_MONTH);
