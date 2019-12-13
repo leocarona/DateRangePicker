@@ -140,30 +140,25 @@ public class MonthView extends LinearLayout {
                         cellView.getSubTitleTextView().setText(subTitle.getTitle());
                     }
 
+                    cellView.setSelectable(cell.isSelectable());
+                    cellView.setCurrentMonth(cell.isCurrentMonth());
+                    cellView.setToday(cell.isToday());
+                    cellView.setRangeState(cell.getRangeState());
+                    cellView.setHighlighted(cell.isHighlighted());
+                    cellView.setRangeUnavailable(cell.isUnavailable());
+
                     cellView.setEnabled(cell.isCurrentMonth());
                     int dayOfWeek = c + 1;
                     Calendar calendar = Calendar.getInstance(timeZone, locale);
                     calendar.setTime(cell.getDate());
                     if ((!activatedDates.isEmpty() && !activatedDates.contains(calendar)) || deactivatedDates.contains(dayOfWeek)) {
                         cellView.setClickable(false);
-                        cellView.setSelectable(cell.isSelectable());
                         cellView.setSelected(false);
-                        cellView.setCurrentMonth(cell.isCurrentMonth());
-                        cellView.setToday(cell.isToday());
-                        cellView.setRangeState(cell.getRangeState());
-                        cellView.setHighlighted(cell.isHighlighted());
-                        cellView.setRangeUnavailable(cell.isUnavailable());
                         cellView.setDeactivated(true);
 
                     } else {
                         cellView.setClickable(!displayOnly);
-                        cellView.setSelectable(cell.isSelectable());
                         cellView.setSelected(cell.isSelected());
-                        cellView.setCurrentMonth(cell.isCurrentMonth());
-                        cellView.setToday(cell.isToday());
-                        cellView.setRangeState(cell.getRangeState());
-                        cellView.setHighlighted(cell.isHighlighted());
-                        cellView.setRangeUnavailable(cell.isUnavailable());
                         cellView.setDeactivated(false);
                     }
 
