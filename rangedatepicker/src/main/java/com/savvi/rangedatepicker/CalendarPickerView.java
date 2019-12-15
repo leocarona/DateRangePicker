@@ -327,7 +327,7 @@ public class CalendarPickerView extends RecyclerView {
                 public boolean isDateSelectable(Date date) {
                     Calendar searchCal = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
                     searchCal.setTime(date);
-                    return !activatedCals.isEmpty() && activatedCals.contains(searchCal);
+                    return containsDate(activatedCals, searchCal);
                 }
             });
 
@@ -963,13 +963,13 @@ public class CalendarPickerView extends RecyclerView {
         return cells;
     }
 
-    private boolean containsDate(List<Calendar> selectedCals, Date date) {
+    public boolean containsDate(List<Calendar> selectedCals, Date date) {
         Calendar cal = Calendar.getInstance(timeZone, locale);
         cal.setTime(date);
         return containsDate(selectedCals, cal);
     }
 
-    private static boolean containsDate(List<Calendar> selectedCals, Calendar cal) {
+    public static boolean containsDate(List<Calendar> selectedCals, Calendar cal) {
         for (Calendar selectedCal : selectedCals) {
             if (sameDate(cal, selectedCal)) {
                 return true;
